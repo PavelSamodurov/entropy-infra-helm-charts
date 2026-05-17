@@ -3,8 +3,10 @@
 Prerequisites: [`talosctl`](https://github.com/siderolabs/talos/releases), `kubectl`, `helm`.
 
 ```shell
-export NODE_IP=<local-ip>     # e.g. 192.168.1.10
-export PUBLIC_IP=<public-ip>  # e.g. your router's external IP
+export NODE_IP=<local-ip>          # e.g. 192.168.1.10
+export PUBLIC_IP=<public-ip>       # e.g. your router's external IP
+export GITHUB_USERNAME=<gh-login>
+export GITHUB_PAT=<ghp_xxx>
 ```
 
 ---
@@ -20,11 +22,13 @@ Boot the VM from Talos ISO. The node starts in **maintenance mode** — waiting 
 > **Do this ONCE.** Every `gen config` run generates new TLS certificates.
 > If you run it again after applying, `_out/talosconfig` will no longer match the node and you lose access.
 
-Fill in `GITHUB_USERNAME`, `GITHUB_PAT`, and `PUBLIC_IP` in `patch-controlplane.yaml`, then run from this directory:
+Run from this directory:
 
 ```shell
+mkdir -p _out
+envsubst < patch-controlplane.yaml > _out/patch-controlplane-filled.yaml
 talosctl gen config resonancelab https://$NODE_IP:6443 \
-  --config-patch-control-plane @patch-controlplane.yaml \
+  --config-patch-control-plane @_out/patch-controlplane-filled.yaml \
   --output-dir _out
 ```
 
