@@ -1,5 +1,8 @@
 cluster:
   allowSchedulingOnControlPlanes: true
+  apiServer:
+    certSANs:
+      - 84.22.133.116
 
 machine:
   registries:

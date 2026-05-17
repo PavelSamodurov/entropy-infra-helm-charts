@@ -2,7 +2,10 @@
 
 Prerequisites: [`talosctl`](https://github.com/siderolabs/talos/releases), `kubectl`, `helm`.
 
-Node IP: `192.168.1.10`
+| | Value |
+|---|---|
+| Local IP | `192.168.1.10` |
+| Public IP | `84.22.133.116` |
 
 ---
 
@@ -60,11 +63,16 @@ cp _out/talosconfig ~/.talos/config
 kubectl get nodes
 ```
 
-For GitHub Actions — encode and save as secret `KUBECONFIG`:
+For GitHub Actions — kubeconfig must point to the public IP. Generate a separate copy:
 
 ```shell
-cat ~/.kube/config | base64 -w 0
+talosctl kubeconfig --nodes 192.168.1.10 --endpoints 192.168.1.10 \
+  --force --merge=false --force-context-name resonancelab /tmp/kubeconfig-gh
+sed -i '' 's|https://192.168.1.10:6443|https://84.22.133.116:6443|' /tmp/kubeconfig-gh
+cat /tmp/kubeconfig-gh | base64 -w 0
 ```
+
+Save the output as GitHub secret `KUBECONFIG`.
 
 ## 6. Deploy ResonanceLab
 
