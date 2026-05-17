@@ -1,0 +1,14 @@
+cluster:
+  allowSchedulingOnControlPlanes: true
+
+machine:
+  registries:
+    mirrors:
+      ghcr.io:
+        endpoints:
+          - https://ghcr.io
+    config:
+      ghcr.io:
+        auth:
+          username: GITHUB_USERNAME
+          password: GITHUB_PAT
