@@ -2,56 +2,71 @@
 
 Prerequisites: [`talosctl`](https://github.com/siderolabs/talos/releases), `kubectl`, `helm`.
 
+Node IP: `192.168.1.10`
+
+---
+
 ## 1. Boot the node
 
-Download the Talos ISO from https://github.com/siderolabs/talos/releases and boot the target machine from it.
-The node will be in maintenance mode, reachable at `<NODE_IP>`.
+Boot the VM from Talos ISO. The node starts in **maintenance mode** — waiting for config over the network.
+
+> To return to maintenance mode later: reattach the ISO in VirtualBox, set Optical first in boot order, reboot.
 
 ## 2. Generate machine configs
 
-Fill in real values for `GITHUB_USERNAME` and `GITHUB_PAT` in `patch-controlplane.yaml`, then:
+> **Do this ONCE.** Every `gen config` run generates new TLS certificates.
+> If you run it again after applying, `_out/talosconfig` will no longer match the node and you lose access.
+
+Fill in `GITHUB_USERNAME` and `GITHUB_PAT` in `patch-controlplane.yaml`, then run from this directory:
 
 ```shell
-talosctl gen config resonancelab https://<NODE_IP>:6443 \
+talosctl gen config resonancelab https://192.168.1.10:6443 \
   --config-patch-control-plane @patch-controlplane.yaml \
   --output-dir _out
 ```
 
-This produces `_out/controlplane.yaml`, `_out/talosconfig`. Do not commit these files.
+Keep `_out/` safe — do not commit, do not regenerate.
 
-## 3. Apply config and bootstrap
+## 3. Apply config
 
-```shell
-talosctl apply-config --insecure --nodes <NODE_IP> --file _out/controlplane.yaml
-
-talosctl bootstrap \
-  --nodes <NODE_IP> \
-  --endpoints <NODE_IP> \
-  --talosconfig _out/talosconfig
-```
-
-Wait ~2 minutes for the cluster to come up:
+Node must be in maintenance mode (step 1). Run from this directory:
 
 ```shell
-talosctl health --nodes <NODE_IP> --endpoints <NODE_IP> --talosconfig _out/talosconfig
+talosctl apply-config --insecure --nodes 192.168.1.10 --file _out/controlplane.yaml
 ```
 
-## 4. Get kubeconfig
+The node reboots and configures itself (~1 min).
+
+## 4. Bootstrap Kubernetes
+
+Run **once** after apply:
 
 ```shell
-talosctl kubeconfig \
-  --nodes <NODE_IP> \
-  --endpoints <NODE_IP> \
-  --talosconfig _out/talosconfig
+talosctl bootstrap --nodes 192.168.1.10 --endpoints 192.168.1.10 --talosconfig _out/talosconfig
 ```
 
-This merges the cluster into `~/.kube/config`. For GitHub Actions — encode and save as secret `KUBECONFIG`:
+Wait for the cluster to come up:
+
+```shell
+talosctl health --nodes 192.168.1.10 --endpoints 192.168.1.10 --talosconfig _out/talosconfig
+```
+
+## 5. Get kubeconfig
+
+```shell
+mkdir -p ~/.kube ~/.talos
+talosctl kubeconfig --nodes 192.168.1.10 --endpoints 192.168.1.10 --talosconfig _out/talosconfig --force --merge=false ~/.kube/config
+cp _out/talosconfig ~/.talos/config
+kubectl get nodes
+```
+
+For GitHub Actions — encode and save as secret `KUBECONFIG`:
 
 ```shell
 cat ~/.kube/config | base64 -w 0
 ```
 
-## 5. Deploy ResonanceLab
+## 6. Deploy ResonanceLab
 
 Run GitHub Actions workflows in order:
 
