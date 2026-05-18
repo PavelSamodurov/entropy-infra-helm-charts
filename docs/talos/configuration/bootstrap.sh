@@ -49,21 +49,26 @@ for i in $(seq 1 300); do
 done
 
 echo
-echo "--- Step 3: Bootstrapping Kubernetes ---"
+echo "--- Step 3: Saving talosconfig ---"
+mkdir -p ~/.talos
+cp "$OUT/talosconfig" ~/.talos/config
+echo "✅ ~/.talos/config saved"
+
+echo
+echo "--- Step 4: Bootstrapping Kubernetes ---"
 talosctl bootstrap --nodes "$NODE_IP" --endpoints "$NODE_IP" --talosconfig "$OUT/talosconfig"
 echo "Waiting for cluster to come up..."
 talosctl health --nodes "$NODE_IP" --endpoints "$NODE_IP" --talosconfig "$OUT/talosconfig"
 
 echo
-echo "--- Step 4: Saving kubeconfig and talosconfig ---"
-mkdir -p ~/.kube ~/.talos
+echo "--- Step 5: Saving kubeconfig ---"
+mkdir -p ~/.kube
 talosctl kubeconfig --nodes "$NODE_IP" --endpoints "$NODE_IP" \
   --talosconfig "$OUT/talosconfig" --force --merge=false ~/.kube/config
-cp "$OUT/talosconfig" ~/.talos/config
-echo "✅ ~/.kube/config and ~/.talos/config saved"
+echo "✅ ~/.kube/config saved"
 
 echo
-echo "--- Step 5: GitHub Actions kubeconfig ---"
+echo "--- Step 6: GitHub Actions kubeconfig ---"
 talosctl kubeconfig --nodes "$NODE_IP" --endpoints "$NODE_IP" \
   --force --merge=false --force-context-name resonancelab /tmp/kubeconfig-gh
 sed -i '' "s|https://$NODE_IP:6443|https://$PUBLIC_IP:6443|" /tmp/kubeconfig-gh
