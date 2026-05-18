@@ -77,15 +77,15 @@ for i in $(seq 1 60); do
 done
 
 echo "Waiting for kube-apiserver to accept connections..."
-for i in $(seq 1 60); do
+for i in $(seq 1 180); do
   if kubectl get nodes --request-timeout=5s &>/dev/null; then
     break
   fi
-  if [ "$i" -eq 60 ]; then
+  if [ "$i" -eq 180 ]; then
     echo "❌ kube-apiserver did not come up in time."
     exit 1
   fi
-  echo "   Waiting... ($i/60)"
+  echo "   Waiting... ($i/180)"
   sleep 10
 done
 
