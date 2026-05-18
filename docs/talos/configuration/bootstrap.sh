@@ -14,6 +14,11 @@ export NODE_IP PUBLIC_IP GITHUB_USERNAME GITHUB_PAT
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUT="$SCRIPT_DIR/_out"
+
+if [ -d "$OUT" ]; then
+  echo "⚠️  Existing _out/ found. Removing stale configs..."
+  rm -rf "$OUT"
+fi
 mkdir -p "$OUT"
 
 echo
