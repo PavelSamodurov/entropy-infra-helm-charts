@@ -77,7 +77,7 @@ for i in $(seq 1 60); do
 done
 
 echo "Waiting for node to be Ready..."
-kubectl wait --for=condition=Ready node --all --timeout=10m
+kubectl wait --for=condition=Ready node --all --timeout=30m
 echo "✅ Cluster is up"
 
 echo
