@@ -7,7 +7,7 @@ echo
 read -rp "Local node IP:    " NODE_IP
 read -rp "Public IP:        " PUBLIC_IP
 read -rp "GitHub username:  " GITHUB_USERNAME
-read -rsp "GitHub PAT:       " GITHUB_PAT
+read -rp "GitHub PAT:       " GITHUB_PAT
 echo
 
 export NODE_IP PUBLIC_IP GITHUB_USERNAME GITHUB_PAT
@@ -29,8 +29,19 @@ echo "✅ Configs generated in _out/"
 echo
 echo "--- Step 2: Applying config (node must be in maintenance mode) ---"
 talosctl apply-config --insecure --nodes "$NODE_IP" --file "$OUT/controlplane.yaml"
-echo "✅ Config applied, waiting for node to reboot (~60s)..."
-sleep 60
+echo "✅ Config applied, waiting for node to come back..."
+for i in $(seq 1 30); do
+  if talosctl version --nodes "$NODE_IP" --endpoints "$NODE_IP" --talosconfig "$OUT/talosconfig" &>/dev/null; then
+    echo "✅ Node is back online"
+    break
+  fi
+  if [ "$i" -eq 30 ]; then
+    echo "❌ Node did not come back in time. Check VirtualBox console."
+    exit 1
+  fi
+  echo "   Waiting... ($i/30)"
+  sleep 10
+done
 
 echo
 echo "--- Step 3: Bootstrapping Kubernetes ---"
