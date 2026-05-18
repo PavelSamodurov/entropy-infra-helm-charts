@@ -2,7 +2,7 @@ cluster:
   allowSchedulingOnControlPlanes: true
   apiServer:
     certSANs:
-      - PUBLIC_IP
+      - $PUBLIC_IP
 
 machine:
   registries:
@@ -13,5 +13,5 @@ machine:
     config:
       ghcr.io:
         auth:
-          username: GITHUB_USERNAME
-          password: GITHUB_PAT
+          username: $GITHUB_USERNAME
+          password: $GITHUB_PAT
