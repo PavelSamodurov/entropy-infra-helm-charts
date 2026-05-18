@@ -57,15 +57,28 @@ echo "✅ ~/.talos/config saved"
 echo
 echo "--- Step 4: Bootstrapping Kubernetes ---"
 talosctl bootstrap --nodes "$NODE_IP" --endpoints "$NODE_IP" --talosconfig "$OUT/talosconfig"
-echo "Waiting for cluster to come up..."
-talosctl health --nodes "$NODE_IP" --endpoints "$NODE_IP" --talosconfig "$OUT/talosconfig"
 
 echo
 echo "--- Step 5: Saving kubeconfig ---"
 mkdir -p ~/.kube
-talosctl kubeconfig --nodes "$NODE_IP" --endpoints "$NODE_IP" \
-  --talosconfig "$OUT/talosconfig" --force --merge=false ~/.kube/config
-echo "✅ ~/.kube/config saved"
+echo "Waiting for kube-apiserver..."
+for i in $(seq 1 60); do
+  if talosctl kubeconfig --nodes "$NODE_IP" --endpoints "$NODE_IP" \
+      --talosconfig "$OUT/talosconfig" --force --merge=false ~/.kube/config &>/dev/null; then
+    echo "✅ ~/.kube/config saved"
+    break
+  fi
+  if [ "$i" -eq 60 ]; then
+    echo "❌ Could not get kubeconfig. Check cluster state."
+    exit 1
+  fi
+  echo "   Waiting... ($i/60)"
+  sleep 10
+done
+
+echo "Waiting for node to be Ready..."
+kubectl wait --for=condition=Ready node --all --timeout=10m
+echo "✅ Cluster is up"
 
 echo
 echo "--- Step 6: GitHub Actions kubeconfig ---"
