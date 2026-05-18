@@ -35,16 +35,16 @@ echo
 echo "--- Step 2: Applying config (node must be in maintenance mode) ---"
 talosctl apply-config --insecure --nodes "$NODE_IP" --file "$OUT/controlplane.yaml"
 echo "✅ Config applied, waiting for node to come back..."
-for i in $(seq 1 30); do
+for i in $(seq 1 300); do
   if talosctl version --nodes "$NODE_IP" --endpoints "$NODE_IP" --talosconfig "$OUT/talosconfig" &>/dev/null; then
     echo "✅ Node is back online"
     break
   fi
-  if [ "$i" -eq 30 ]; then
+  if [ "$i" -eq 300 ]; then
     echo "❌ Node did not come back in time. Check VirtualBox console."
     exit 1
   fi
-  echo "   Waiting... ($i/30)"
+  echo "   Waiting... ($i/300)"
   sleep 10
 done
 
