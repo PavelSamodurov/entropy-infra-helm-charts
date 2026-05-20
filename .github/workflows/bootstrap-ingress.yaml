@@ -54,13 +54,6 @@ jobs:
             --timeout 40m \
             --wait
 
-      - name: Create Cloudflare API token secret
-        run: |
-          kubectl create secret generic cloudflare-api-token \
-            --from-literal=api-token=${{ secrets.CLOUDFLARE_API_TOKEN }} \
-            --namespace cert-manager \
-            --dry-run=client -o yaml | kubectl apply -f -
-
       - name: Create ClusterIssuers
         run: |
           kubectl apply -f - <<EOF
@@ -75,11 +68,9 @@ jobs:
               privateKeySecretRef:
                 name: letsencrypt-staging
               solvers:
-                - dns01:
-                    cloudflare:
-                      apiTokenSecretRef:
-                        name: cloudflare-api-token
-                        key: api-token
+                - http01:
+                    ingress:
+                      class: nginx
           ---
           apiVersion: cert-manager.io/v1
           kind: ClusterIssuer
@@ -92,11 +83,9 @@ jobs:
               privateKeySecretRef:
                 name: letsencrypt-prod
               solvers:
-                - dns01:
-                    cloudflare:
-                      apiTokenSecretRef:
-                        name: cloudflare-api-token
-                        key: api-token
+                - http01:
+                    ingress:
+                      class: nginx
           EOF
 
       - name: Create namespace
