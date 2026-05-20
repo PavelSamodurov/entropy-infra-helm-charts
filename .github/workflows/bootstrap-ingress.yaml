@@ -38,7 +38,7 @@ jobs:
             --create-namespace \
             --set controller.replicaCount=1 \
             --atomic \
-            --timeout 5m \
+            --timeout 40m \
             --wait
 
       - name: Install cert-manager
@@ -50,7 +50,7 @@ jobs:
             --create-namespace \
             --set crds.enabled=true \
             --atomic \
-            --timeout 5m \
+            --timeout 40m \
             --wait
 
       - name: Create Cloudflare API token secret
