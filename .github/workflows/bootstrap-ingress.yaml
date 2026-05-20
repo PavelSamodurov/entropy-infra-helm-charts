@@ -37,7 +37,8 @@ jobs:
             --namespace ingress-nginx \
             --create-namespace \
             --set controller.replicaCount=1 \
-            --atomic \
+            --set controller.progressDeadlineSeconds=3600 \
+            --rollback-on-failure \
             --timeout 40m \
             --wait
 
