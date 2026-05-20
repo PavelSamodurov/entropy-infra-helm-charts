@@ -22,7 +22,7 @@ echo "📦 Installing dependencies..."
 apt-get install -y curl net-tools
 
 echo "🐳 Installing K3s..."
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable traefik --disable servicelb" sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable traefik" sh -
 
 echo "⏳ Waiting for K3s cluster to become ready (this may take 30-90 seconds)..."
 sleep 20
@@ -70,4 +70,4 @@ echo "   k get pods -A"
 echo "   helm version"
 echo ""
 echo "🎉 Your K3s cluster with Helm is ready to use!"
-echo "   Traefik and ServiceLB have been disabled."
+echo "   Traefik has been disabled. ServiceLB is enabled for LoadBalancer support."
