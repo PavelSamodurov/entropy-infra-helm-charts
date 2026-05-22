@@ -24,7 +24,7 @@ on:
         description: 'Helm upgrade timeout (e.g. 5m, 10m)'
         required: false
         type: string
-        default: '5m'
+        default: '60m'
     secrets:
       KUBECONFIG:
         description: 'Base64-encoded kubeconfig for target cluster'
@@ -75,7 +75,7 @@ on:
         description: 'Helm upgrade timeout (e.g. 5m, 10m)'
         required: false
         type: string
-        default: '5m'
+        default: '60m'
 
 jobs:
   deploy:
