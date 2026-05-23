@@ -47,6 +47,18 @@ on:
       STT_MAX_TOKEN:
         description: 'STT max token'
         required: true
+      SOCKS_5_PROXY_HOST:
+        description: 'SOCKS5 proxy host'
+        required: false
+      SOCKS_5_PROXY_PORT:
+        description: 'SOCKS5 proxy port'
+        required: false
+      SOCKS_5_PROXY_USERNAME:
+        description: 'SOCKS5 proxy username'
+        required: false
+      SOCKS_5_PROXY_PASSWORD:
+        description: 'SOCKS5 proxy password'
+        required: false
 
   workflow_dispatch:
     inputs:
@@ -120,6 +132,10 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           STT_MAX_TOKEN: ${{ secrets.STT_MAX_TOKEN }}
+          SOCKS_5_PROXY_HOST: ${{ secrets.SOCKS_5_PROXY_HOST }}
+          SOCKS_5_PROXY_PORT: ${{ secrets.SOCKS_5_PROXY_PORT }}
+          SOCKS_5_PROXY_USERNAME: ${{ secrets.SOCKS_5_PROXY_USERNAME }}
+          SOCKS_5_PROXY_PASSWORD: ${{ secrets.SOCKS_5_PROXY_PASSWORD }}
         run: |
           helm upgrade --install ${{ inputs.service_name }} \
             ./charts/${{ inputs.service_name }} \
@@ -131,6 +147,10 @@ jobs:
             --set-string postgresUser="${POSTGRES_USER}" \
             --set-string postgresPassword="${POSTGRES_PASSWORD}" \
             --set-string sttMaxToken="${STT_MAX_TOKEN}" \
+            --set-string socks5ProxyHost="${SOCKS_5_PROXY_HOST}" \
+            --set-string socks5ProxyPort="${SOCKS_5_PROXY_PORT}" \
+            --set-string socks5ProxyUsername="${SOCKS_5_PROXY_USERNAME}" \
+            --set-string socks5ProxyPassword="${SOCKS_5_PROXY_PASSWORD}" \
             --set-file applicationConfig=./environments/${{ inputs.environment }}/application-env.yaml \
             --namespace ${{ inputs.environment }} \
             --create-namespace \

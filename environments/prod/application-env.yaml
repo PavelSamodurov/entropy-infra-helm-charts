@@ -18,6 +18,11 @@ ai:
       - provider: "ollama"
 
 transcription:
+  proxy:
+    host: ${SOCKS_5_PROXY_HOST}
+    port: ${SOCKS_5_PROXY_PORT}
+    username: ${SOCKS_5_PROXY_USERNAME}
+    password: ${SOCKS_5_PROXY_PASSWORD}
   routing:
     ttl: PT1H
     phases:
@@ -25,9 +30,11 @@ transcription:
   groq:
     api-key: ${GROQ_API_KEY}
     model: whisper-large-v3-turbo
+    use-proxy: true
   deepinfra:
     api-key: ${DEEPINFRA_API_KEY}
     model: openai/whisper-large-v3-turbo
+    use-proxy: true
 
 upstream:
   max:

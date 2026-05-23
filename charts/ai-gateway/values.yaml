@@ -31,6 +31,10 @@ deepinfraApiKey: ""
 postgresUser: ""
 postgresPassword: ""
 sttMaxToken: ""
+socks5ProxyHost: ""
+socks5ProxyPort: ""
+socks5ProxyUsername: ""
+socks5ProxyPassword: ""
 
 # Populated at deploy time via --set-file applicationConfig=environments/<env>/application-env.yaml
 applicationConfig: ""
