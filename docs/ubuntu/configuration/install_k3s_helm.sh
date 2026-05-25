@@ -3,6 +3,7 @@ set -euo pipefail
 
 echo "=== Automated K3s + Helm Installation Script ==="
 echo "Target: Clean Ubuntu/Debian server"
+echo "Usage: $0 [external_ip1] [external_ip2] ..."
 echo "============================================"
 
 # Check if running as root
@@ -10,6 +11,12 @@ if [ "$(id -u)" -ne 0 ]; then
   echo "❌ Error: This script must be run as root or with sudo"
   exit 1
 fi
+
+# Build --tls-san flags from arguments (needed for external kubectl/CI access)
+TLS_SAN_FLAGS=""
+for ip in "$@"; do
+  TLS_SAN_FLAGS="$TLS_SAN_FLAGS --tls-san $ip"
+done
 
 # Prevent interactive prompts during package installation
 export DEBIAN_FRONTEND=noninteractive
@@ -22,7 +29,7 @@ echo "📦 Installing dependencies..."
 apt-get install -y curl net-tools
 
 echo "🐳 Installing K3s..."
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable traefik" sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable traefik $TLS_SAN_FLAGS" sh -
 
 echo "⏳ Waiting for K3s cluster to become ready (this may take 30-90 seconds)..."
 sleep 20
