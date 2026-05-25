@@ -270,4 +270,4 @@ jobs:
           fi
           kubectl rollout status ${RESOURCE_TYPE}/${{ inputs.component }} \
             --namespace=${{ inputs.environment }} \
-            --timeout=10m
+            --timeout=60m
